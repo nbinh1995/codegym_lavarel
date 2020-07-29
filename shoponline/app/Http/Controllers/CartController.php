@@ -18,7 +18,7 @@ class CartController extends Controller
         $item_id_list = array_column($cart_data, 'product_id');
         if (in_array($request->product_id, $item_id_list)) {
             foreach ($cart_data as $keys => $values) {
-                if ($cart_data[$keys]["product_id"] == $_POST["product_id"]) {
+                if ($cart_data[$keys]["product_id"] == $request->product_amount) {
                     $cart_data[$keys]["product_amount"] = $cart_data[$keys]["product_amount"] + $request->product_amount;
                     $cart_data[$keys]["product_total"] = $cart_data[$keys]["product_amount"] * $cart_data[$keys]["product_price"];
                 }
