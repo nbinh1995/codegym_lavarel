@@ -21,7 +21,7 @@
                                 <input type="hidden" name="product_name" value="<?= $product->name ?>">
                                 <input type="hidden" name="product_img" value="<?= $product->img ?>">
                                 <input type="hidden" name="product_price" value="<?= $product->price ?>">
-                                <button class="btn-sing" type="submit">Add To Cart</button>
+                                <button class="btn btn-primary" type="submit">Add To Cart</button>
                             </form>
                         </div>
                     </div>
@@ -37,11 +37,6 @@
     product_img = $(ele).find("input[name='product_img']").val();
     product_price = $(ele).find("input[name='product_price']").val();
     product_amount = $(ele).find("input[name='product_amount']").val();
-    // console.log(product_id);
-    // console.log(product_name);
-    // console.log(product_img);
-    // console.log(product_price);
-    // console.log(product_amount);
     $.ajax({
     url: "{{ route('products.addCart') }}",
     method: "post",
@@ -53,7 +48,7 @@
     product_amount: product_amount},
     success: function (data) {
    
-    alert('add oke!');
+    toastr["success"]("Add Success!")
     }
     });
     }

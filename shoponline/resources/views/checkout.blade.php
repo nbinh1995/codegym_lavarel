@@ -11,7 +11,7 @@
                     </div>
                     <div class="row justify-content-between">
                         <a href="{{ route('home')}}">Back</a>
-                        <a href="" onclick="getClear()">Clear</a>
+                        <span onclick="getClear()" style="cursor: pointer; color:blue;">Clear </span>
                     </div>
                 </div>
                 <div class="card-body">
@@ -32,12 +32,13 @@
         },
         success: function (data) {
         $('.card-body').html(data)
-        alert('clear oke!');
+        toastr["success"]("Clear Success!")
         }
         }); 
     }
 
     function getRemove(id){
+        
         url = window.location.origin+'/removeCart/'+id;
         console.log(url);
         $.ajax({
@@ -47,7 +48,7 @@
         },
         success: function (data) {
         $('.card-body').html(data)
-        alert('remove oke!');
+        toastr["success"]("Remove Success!")
         }
         });
     }
@@ -64,7 +65,7 @@
     product_amount: product_amount},
     success: function (data) {
     $('.card-body').html(data)
-    alert('add oke!');
+    toastr["success"]("Update Success!")
     }
     });
     }
