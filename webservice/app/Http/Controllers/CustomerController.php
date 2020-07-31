@@ -18,7 +18,7 @@ class CustomerController extends Controller
     {
         $customers = $this->customerService->getAll();
 
-        return response()->json(["hello World"], 200);
+        return response()->json($customers, 200);
     }
 
     public function show($id)

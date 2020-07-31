@@ -105,6 +105,6 @@ class ProductController extends Controller
         if (session('cart')) {
             $product = session('cart');
         } else $product = '';
-        return view('checkout', ['product' => $product]);
+        return view('cart', ['product' => $product]);
     }
 }

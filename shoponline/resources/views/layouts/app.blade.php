@@ -12,6 +12,7 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/minus_and_plus.js') }}" defer></script>
     <!-- Fonts -->
     <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -41,7 +42,7 @@
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
-                    <form action="" method="get" class="navbar-nav mr-auto">
+                    <form action="#" method="get" class="navbar-nav mr-auto">
                         <input type="text" name="search" class="search" placeholder="Search">
                         <button type="submit" class="icon-search"><i class="fas fa-search "></i></button>
                     </form>
@@ -49,7 +50,18 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('checkout')}}"><i class="fas fa-cart-plus"></i></a>
+                            <div class="dropdown nav-link">
+                                <a class="dropdown-toggle" href="{{ route('checkout')}}" id="dropdownMenuLink1"
+                                    data-toggle="" aria-haspopup="true" aria-expanded="false"><i
+                                        class="fa fa-shopping-cart"></i> Cart
+                                    <span class="badge">{{session('cart')['count'] ?? 0}}</span></a>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <div id="cart">
+                                        @include('partials.hover_cart')
+                                    </div>
+                                    <!--end shopping-cart -->
+                                </div>
+                            </div>
                         </li>
                         <!-- Authentication Links -->
                         @guest
@@ -90,6 +102,104 @@
             @yield('content')
         </main>
     </div>
+    <script>
+        window.addEventListener('resize', reportWindowSize);
+        function reportWindowSize(){
+            console.log(window.innerWidth);
+            if(window.innerWidth < '768'){     
+                $('#dropdownMenuLink1').attr('data-toggle','dropdown');
+            }else{
+                $('#dropdownMenuLink1').attr('data-toggle','');
+                $('#dropdownMenuLink1').attr('aria-expanded','false');
+                $('#dropdownMenuLink1 ~div').removeClass('show');
+            }
+        }
+        function getSubmit(ele) {
+        product_id = $(ele).find("input[name='product_id']").val();
+        product_name = $(ele).find("input[name='product_name']").val();
+        product_img = $(ele).find("input[name='product_img']").val();
+        product_price = $(ele).find("input[name='product_price']").val();
+        amount = 'product_amount' + product_id;
+        product_amount = $(ele).find("input[name=" + amount + "]").val();
+        $.ajax({
+        url: "{{ route('products.addCart') }}",
+        method: "post",
+        data: {
+        _token: '{{ csrf_token() }}',
+        product_id: product_id,
+        product_name: product_name,
+        product_img: product_img,
+        product_price: product_price,
+        product_amount: product_amount
+        },
+        success: function (data) {
+        $(ele).find("input[name=" + amount + "]").val(1);    
+        $('#cart').html(data['hover'])
+        $('.badge').text(data['count'])
+        toastr.options = {"positionClass": "toast-bottom-right"}
+        toastr["success"]("Add Success!")
+        }
+        });
+        }
+        
+        function getClear() {
+        $.ajax({
+        url: "{{ route('products.clearCart') }}",
+        method: "get",
+        data: {
+        _token: '{{ csrf_token() }}',
+        },
+        success: function (data) {
+        $('.cart-table').html(data['table'])
+        $('#cart').html(data['hover'])
+        $('.badge').text(data['count'])
+        toastr.options = {"positionClass": "toast-bottom-right"}
+        toastr["success"]("Clear Success!")
+        }
+        });
+        }
+        
+        function getRemove(id) {
+        
+        url = window.location.origin + '/removeCart/' + id;
+        $.ajax({
+        url: url,
+        method: "get",
+        data: {
+        _token: '{{ csrf_token() }}',
+        },
+        success: function (data) {
+        $('.cart-table').html(data['table'])
+        $('#cart').html(data['hover'])
+        $('.badge').text(data['count'])
+        toastr.options = {"positionClass": "toast-bottom-right"}
+        toastr["success"]("Remove Success!")
+        }
+        });
+        }
+        
+        function getChange(ele) {
+        product_amount = $(ele).val();
+        id = $(ele).data('id');
+        // console.log("{{ route('products.updateCart',['id'=>"+id+"]) }}");
+        $.ajax({
+        url: "{{ route('products.updateCart') }}",
+        method: "post",
+        data: {
+        _token: '{{ csrf_token() }}',
+        product_id: id,
+        product_amount: product_amount
+        },
+        success: function (data) {
+        $('.cart-table').html(data['table'])
+        $('#cart').html(data['hover'])
+        $('.badge').text(data['count'])
+        toastr.options = {"positionClass": "toast-bottom-right"}
+        toastr["success"]("Update Success!")
+        }
+        });
+        }
+    </script>
 </body>
 
 </html>
