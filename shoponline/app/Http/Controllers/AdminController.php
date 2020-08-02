@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -18,19 +20,29 @@ class AdminController extends Controller
 
     public function index()
     {
-        return view('dashboard');
+        return $this->isAdmin(view('dashboard'));
     }
 
     public function users()
     {
-        return view('dashboard.users');
+        return $this->isAdmin(view('dashboard.users'));
     }
     public function categories()
     {
-        return view('dashboard.categories');
+        return $this->isAdmin(view('dashboard.categories'));
     }
     public function products()
     {
-        return view('dashboard.products');
+        $products = Product::all();
+        return $this->isAdmin(view('dashboard.products', compact('products')));
+    }
+
+    public function isAdmin($view)
+    {
+        if (Auth::user()->role == 1) {
+            return $view;
+        } else {
+            return redirect()->route('home');
+        }
     }
 }

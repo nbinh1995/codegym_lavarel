@@ -4,9 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+    }
     /**
      * Display a listing of the resource.
      *
@@ -14,17 +23,14 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::paginate();
-        return response()->json(['products' => $products, 'message' => 'Oke!']);
-    }
+        try {
+            $products = Product::all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
+            return view('partials.tbody_product', compact('products'))->render();
+        } catch (\Throwable $th) {
+
+            return response()->json("lỗi");
+        }
     }
 
     /**
@@ -35,9 +41,27 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $product = Product::create($request->all());
+        try {
+            $name = $request->file('img');
 
-        return response()->json(['product' => $product, 'message' => 'created!']);
+            $product = new Product();
+            $product->category_id = $request->category_id;
+            $product->name = $request->name;
+            $product->price = $request->price;
+            $product->desc = $request->desc;
+            if ($request->file('img')) {
+                $imagePath = $request->file('img');
+                $path = $imagePath->store('uploads', 'public');
+                $product->img = '/storage/' . $path;
+            }
+            $product->save();
+
+            // $data = $this->index();
+            return response()->json(['data' => $product, 'code' => 200], 200);
+        } catch (\Throwable $th) {
+
+            return response()->json("lỗi");
+        }
     }
 
     /**
@@ -48,17 +72,14 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return response()->json(['product' => $product, 'message' => 'Oke!']);
-    }
+        try {
+            $edit = view('partials.form_edit', ['item_edit' => $product])->render();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
+            return response()->json(['data' => $edit, 'code' => 200], 200);
+        } catch (\Throwable $th) {
+
+            return response()->json("lỗi");
+        }
     }
 
     /**
@@ -70,9 +91,24 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $product->update($request->all());
 
-        return response()->json(['product' => $product, 'message' => 'updated!']);
+        try {
+            $product->category_id = $request->category_id;
+            $product->name = $request->name;
+            $product->price = $request->price;
+            $product->desc = $request->desc;
+            if ($request->file('img')) {
+                $imagePath = $request->file('img');
+                $path = $imagePath->store('uploads', 'public');
+                $product->img = '/storage/' . $path;
+            }
+            $product->update();
+            $data = view('partials.row_product', compact('product'))->render();
+            return response()->json(['data' => $data, 'code' => 200], 200);
+        } catch (\Throwable $th) {
+            return response()->json("lỗi");
+        }
+        // $product->update($request->all());
     }
 
     /**
@@ -83,21 +119,31 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product->delete();
-        return response()->json([
-            'message' => 'deleted'
-        ]);
+        try {
+            unlink(public_path($product->img));
+            $product->delete();
+            return response()->json([
+                'code' => 200
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json("lỗi");
+        }
     }
 
     public function showProduct()
     {
-        $products = Product::paginate();
+        try {
+            $products = Product::paginate(6);
 
-        return view('home', compact('products'));
+            return view('home', compact('products'));
+        } catch (\Throwable $th) {
+
+            return response()->json("lỗi");
+        }
     }
     public function showSingle(Product $product)
     {
-        return view('single', compact('product'));
+        return view('site.single', compact('product'));
     }
 
     public function showCheckout()
@@ -105,6 +151,17 @@ class ProductController extends Controller
         if (session('cart')) {
             $product = session('cart');
         } else $product = '';
-        return view('cart', ['product' => $product]);
+        return view('site.cart', ['product' => $product]);
+    }
+
+    function validateData()
+    {
+        return request()->validate([
+            'category_id' => 'required',
+            'name' => 'required',
+            'price' => 'required|numeric|min:0',
+            'desc' => 'required',
+            'img' => 'required|mimes:jpeg,bmp,png,gif,svg,webp'
+        ]);
     }
 }

@@ -30,10 +30,10 @@
     position: relative;
     overflow: hidden;
 }
-img {
+/* img {
     width: 100%;
     height: auto;
-}
+} */
 /*Hover Effect thumbnail*/
 .thumbnail .overlay {
     position: absolute;
@@ -169,12 +169,15 @@ img {
     content: attr(title);
     display: table;
 }
-
+#cart {
+    overflow-y: scroll;
+    max-height: 50vh;
+}
 @media (min-width: 768px) {
-    .dropdown-menu {
+    .menu-cart {
         padding: 0;
     }
-    .dropdown:hover > .dropdown-menu {
+    .dropdown-cart:hover > .menu-cart {
         display: block;
     }
     .shopping-cart {
@@ -184,5 +187,8 @@ img {
     .shopping-cart .shopping-cart-items img {
         float: left;
         margin-right: 12px;
+    }
+    #menu {
+        display: none;
     }
 }

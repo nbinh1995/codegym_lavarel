@@ -5,7 +5,10 @@
     <div class="row justify-content-center">
         <div class="col">
             <div class="card">
-                <div class="card-header">{{ __('SHOP') }}</div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>{{ __('SHOP') }}</span>
+                    <span>{{ $products->links() }}</span>
+                </div>
                 <div class="card-body">
                     <div class="content">
                         @foreach ($products as $product)

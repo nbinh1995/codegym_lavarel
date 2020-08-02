@@ -9,7 +9,7 @@
                     <div style="text-align: center">
                         {{ __('CheckOut') }}
                     </div>
-                    <div class="row justify-content-between">
+                    <div class="d-flex justify-content-between">
                         <a href="{{ route('home')}}">Back</a>
                         <span onclick="getClear()" style="cursor: pointer; color:blue;">Clear </span>
                     </div>
